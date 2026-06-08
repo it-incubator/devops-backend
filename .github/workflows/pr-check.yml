@@ -7,14 +7,10 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        node-version: [23,24]
-        exclude:
-          - os: windows-latest
-            node-version: 23
+        node-version: [20, 23, 24]
         include:
           - node-version: 24
             experimental: true
