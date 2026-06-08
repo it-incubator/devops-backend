@@ -55,6 +55,9 @@ jobs:
     needs: [checks, deploy, build]
     if: always()
     uses:  ./.github/workflows/notify.yaml
+    with:
+      checks_result: ${{ needs.cheks.result }}
+      deploy_result: ${{ needs.deploy.result }}
     secrets:
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

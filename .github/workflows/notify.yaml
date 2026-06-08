@@ -2,6 +2,13 @@ name: Notify
 
 on:
   workflow_call:
+    inputs:
+      checks_result:
+        required: true
+        type: string
+      deploy_result:
+        required: true
+        type: string
     secrets:
       TELEGRAM_BOT_TOKEN:
         required: true
@@ -15,9 +22,8 @@ jobs:
     steps:
       - name: Notify Telegram
         run: |
-          CHECKS="${{ needs.checks.result }}"
-          DEPLOY="${{ needs.deploy.result }}"
-          STATUS="${{ job.status }}"
+          CHECKS="${{ inputs.checks_result }}"
+          DEPLOY="${{ inputs.checks_result }}"
 
           if [ "$CHECKS" != "success" ]; then
             TEXT="❌ Тесты упал%0A${{ github.repository }} @ ${{ github.ref_name }}%0AСмотри: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
