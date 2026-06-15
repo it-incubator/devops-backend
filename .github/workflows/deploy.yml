@@ -6,33 +6,10 @@ on:
 
 jobs:
   checks:
-    uses: ./.github/workflows/pr-check.yml
-
-  build:
-    needs: [checks]
-    runs-on: ubuntu-latest
-    outputs:
-      image_sha: ${{ steps.build-push.outputs.image_sha}}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Вход в Docker hub
-        run: docker login -u ${{ vars.DOCKER_USER }} -p ${{ secrets.DOCKER_PASS }}
-
-      - name: Build and Push образа
-        id: build-push
-        env:
-          IMAGE_SHA: ${{ vars.DOCKER_USER }}/backend:sha-${{ github.sha }}
-          IMAGE_LATEST: ${{ vars.DOCKER_USER }}/backend:latest
-        run: |
-          docker build -t $IMAGE_SHA -t $IMAGE_LATEST . 
-          docker push $IMAGE_SHA
-          docker push $IMAGE_LATEST
-          echo "image_sha=$IMAGE_SHA" >> $GITHUB_OUTPUT
-          
+    uses: ./.github/workflows/checks.yml
 
   deploy:
-    needs: [build]
+    needs: checks
     runs-on: ubuntu-latest
 
     steps:
@@ -43,21 +20,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/myapp
-            
-            # Обновляем DOCKER_IMAGE в .env на конкретный SHA коммита
-            sed -i "s|DOCKER_IMAGE=.*|DOCKER_IMAGE=${{ needs.build.outputs.image_sha  }}|" .env
-            
-            docker compose up -d --no-deps backend
-           
-
-  notify:
-    needs: [checks, deploy, build]
-    if: always()
-    uses:  ./.github/workflows/notify.yaml
-    with:
-      checks_result: ${{ needs.checks.result }}
-      deploy_result: ${{ needs.deploy.result }}
-    secrets:
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+            cd /var/www/lesson/backend
+            git pull origin main
+            cd /var/www/lesson
+            docker compose up --build -d backend
