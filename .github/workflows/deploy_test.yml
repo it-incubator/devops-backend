@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST_TEST }}
+          username: ${{ secrets.SSH_USER_TEST }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_TEST }}
+          script: |
+            cd /home/deploy/vchch.xyz
+            touch test.txt
+          
