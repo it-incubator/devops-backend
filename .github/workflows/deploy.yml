@@ -52,6 +52,7 @@ jobs:
            
 
   notify:
+    name: Notify JOB
     needs: [checks, deploy, build]
     if: always()
     uses:  ./.github/workflows/notify.yaml
