@@ -16,6 +16,6 @@ jobs:
           username: ${{ secrets.SSH_USER_TEST }}
           key: ${{ secrets.SSH_PRIVATE_KEY_TEST }}
           script: |
-            cd /home/deploy/test
+            cd /home/artem/test
             touch test123.txt
           
