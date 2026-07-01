@@ -1,7 +1,8 @@
-name: Deploy
+name: Deploy k8s
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   checks:
@@ -11,11 +12,11 @@ jobs:
     needs: [checks]
     runs-on: ubuntu-latest
     outputs:
-      image_sha: ${{ steps.build-push.outputs.image_sha}}
+      image_sha: ${{ steps.build-push.outputs.image_sha }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Вход в Docker hub
+      - name: Вход в Docker Hub
         run: docker login -u ${{ vars.DOCKER_USER }} -p ${{ secrets.DOCKER_PASS }}
 
       - name: Build and Push образа
@@ -24,37 +25,30 @@ jobs:
           IMAGE_SHA: ${{ vars.DOCKER_USER }}/backend:sha-${{ github.sha }}
           IMAGE_LATEST: ${{ vars.DOCKER_USER }}/backend:latest
         run: |
-          docker build -t $IMAGE_SHA -t $IMAGE_LATEST . 
+          docker build -t $IMAGE_SHA -t $IMAGE_LATEST .
           docker push $IMAGE_SHA
           docker push $IMAGE_LATEST
           echo "image_sha=$IMAGE_SHA" >> $GITHUB_OUTPUT
-          
 
   deploy:
     needs: [build]
     runs-on: ubuntu-latest
-
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/myapp
-            
-            # Обновляем DOCKER_IMAGE в .env на конкретный SHA коммита
-            sed -i "s|DOCKER_IMAGE=.*|DOCKER_IMAGE=${{ needs.build.outputs.image_sha  }}|" .env
-            
-            docker compose up -d --no-deps backend
-           
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Deploy to k3s
+        run: |
+          kubectl set image deployment/backend backend=${{ needs.build.outputs.image_sha }}
+          kubectl rollout status deployment/backend --timeout=120s
 
   notify:
     name: Notify JOB
     needs: [checks, deploy, build]
     if: always()
-    uses:  ./.github/workflows/notify.yaml
+    uses: ./.github/workflows/notify.yaml
     with:
       checks_result: ${{ needs.checks.result }}
       deploy_result: ${{ needs.deploy.result }}
