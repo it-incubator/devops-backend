@@ -40,8 +40,10 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
 
       - name: Deploy to k3s
+        env:
+          IMAGE: ${{ needs.build.outputs.image_sha }}
         run: |
-          kubectl set image deployment/backend-api  backend-api=${{ needs.build.outputs.image_sha }}
+          envsubst < k8s/backend.yaml | kubectl apply -f -
           kubectl rollout status deployment/backend-api  --timeout=120s
 
   notify:
