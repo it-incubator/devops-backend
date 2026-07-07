@@ -1,0 +1,46 @@
+prometheus:
+  prometheusSpec:
+    # Хранить метрики 15 дней
+    retention: 15d
+    # PersistentVolume для Prometheus
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+grafana:
+  # Пароль администратора
+  adminPassword: "your-secure-password"
+
+  # PersistentVolume для Grafana
+  persistence:
+    enabled: true
+    size: 2Gi
+
+  # Ingress для доступа по домену
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana-k8s.it-kamasutra.com
+    tls:
+      - hosts:
+          - grafana-k8s.it-kamasutra.com
+        secretName: grafana-tls
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+
+  # Loki как дополнительный источник данных
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki.monitoring.svc.cluster.local:3100
+      editable: true
+
+# Node Exporter включён по умолчанию — это DaemonSet,
+# который сам разворачивается на каждой ноде
+nodeExporter:
+  enabled: true
