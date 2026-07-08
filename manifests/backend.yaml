@@ -20,10 +20,10 @@ spec:
           resources:
             requests:
               cpu: "60m"
-              memory: "5Gi"
+              memory: "100Mi"
             limits:
               cpu: "100m"
-#              memory: "120Mi"
+              memory: "120Mi"
           ports:
             - containerPort: 3000
           envFrom:
