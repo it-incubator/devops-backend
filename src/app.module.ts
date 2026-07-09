@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 import { MetricsModule } from './metrics.module';
 import { ConfigModule } from '@nestjs/config';
 import { MetricsMiddleware } from './metrics.middleware';
+import {HealthController} from "./health.controller";
+import {ReadinessService} from "./readiness.service";
 
 @Module({
   imports: [
@@ -19,8 +21,8 @@ import { MetricsMiddleware } from './metrics.middleware';
       synchronize: false,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, HealthController],
+  providers: [AppService, ReadinessService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
