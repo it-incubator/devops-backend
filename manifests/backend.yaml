@@ -19,21 +19,21 @@ spec:
           image: ${IMAGE}
           startupProbe:
             httpGet:
-              path: /health
+              path: /app/health
               port: 3000
             failureThreshold: 12
             timeoutSeconds: 3
             periodSeconds: 5
           livenessProbe:
             httpGet:
-              path: /health
+              path: /app/health
               port: 3000
             initialDelaySeconds: 0
             periodSeconds: 15
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /ready
+              path: /app/ready
               port: 3000
             initialDelaySeconds: 0
             periodSeconds: 10
