@@ -15,4 +15,8 @@ export class ReadinessService implements OnApplicationBootstrap {
   isReady(): boolean {
     return this.ready;
   }
+
+  setIsReady(value: boolean) {
+    this.ready = value
+  }
 }

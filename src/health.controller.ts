@@ -1,4 +1,4 @@
-import {Controller, Get, HttpException, HttpStatus} from '@nestjs/common';
+import {Controller, Get, HttpException, HttpStatus, ParseBoolPipe, Query} from '@nestjs/common';
 import {ReadinessService} from "./readiness.service";
 
 @Controller('app')
@@ -16,5 +16,11 @@ export class HealthController {
       throw new HttpException('not ready', HttpStatus.SERVICE_UNAVAILABLE); // 503
     }
     return 'success';
+  }
+  @Get('/set-ready')
+  setIsReady(
+      @Query('isReady', ParseBoolPipe) isReady: boolean
+  ) {
+     this.readinessService.setIsReady(isReady)
   }
 }
