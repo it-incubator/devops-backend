@@ -19,4 +19,10 @@ export class ReadinessService implements OnApplicationBootstrap {
   setIsReady(value: boolean) {
     this.ready = value
   }
+
+  setHealth() {
+   while (true) {
+     console.log("working")
+   }
+  }
 }

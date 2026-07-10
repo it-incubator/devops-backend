@@ -23,4 +23,11 @@ export class HealthController {
   ) {
      this.readinessService.setIsReady(isReady)
   }
+
+
+  @Get('/set-health')
+  setHealth(
+  ) {
+    this.readinessService.setHealth()
+  }
 }
