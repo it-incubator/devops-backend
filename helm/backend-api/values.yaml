@@ -16,6 +16,7 @@ resources:
 config:
   NODE_ENV: "production"
 
+
 ingress:
   host: api.it-kamasutra.com
   tlsSecret: backend-api-tls
