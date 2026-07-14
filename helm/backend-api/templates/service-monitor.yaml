@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-api-monitor
+  labels:
+    release: kube-prometheus-stack   # ← должен совпадать с именем release Helm
+spec:
+  selector:
+    matchLabels:
+      app: backend-api
+  endpoints:
+    - port: http      # имя порта из Service
+      path: /metrics
+      interval: 15s

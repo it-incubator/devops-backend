@@ -31,23 +31,30 @@ jobs:
           echo "image_sha=$IMAGE_SHA" >> $GITHUB_OUTPUT
 
   deploy:
-    needs: [build]
+    needs: [ build ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Configure kubectl
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
         run: |
           mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+          echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
 
-      - name: Deploy to k3s
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Deploy with Helm
         env:
-          IMAGE: ${{ needs.build.outputs.image_sha }}
+          IMAGE_TAG: ${{ needs.build.outputs.image_sha }}
         run: |
-          envsubst < manifests/backend.yaml | kubectl apply -f -
-          kubectl annotate deployment/backend-api kubernetes.io/change-cause="sha-${{ github.sha }}" --overwrite
-          kubectl rollout status deployment/backend-api  --timeout=240s
+          helm upgrade backend-api ./helm/backend-api \
+            --reuse-values \
+            --set image.name="$IMAGE_TAG" \
+            --wait \
+            --timeout 4m
 
   notify:
     name: Notify JOB
