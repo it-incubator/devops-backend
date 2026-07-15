@@ -6,6 +6,6 @@ useDefault = true
 
 [allowlist]
 paths = [
-    '''.gitleaks.toml''',
-    '''README.MD''',
+    '''\.gitleaks\.toml''',
+    '''README\.md''',
 ]
