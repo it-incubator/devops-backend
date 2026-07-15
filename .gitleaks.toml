@@ -2,3 +2,10 @@ title = "gitleaks config"
 
 [extend]
 useDefault = true
+
+
+[allowlist]
+paths = [
+    '''.gitleaks.toml''',
+    '''README.MD''',
+]
