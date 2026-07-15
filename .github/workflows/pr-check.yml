@@ -8,7 +8,7 @@ on:
 jobs:
   security-scan:
     name: "Security scan"
-    uses: ./.github/workflows/sast-sca.yaml@main
+    uses: ./.github/workflows/sast-sca.yaml
 
   test:
     runs-on: ubuntu-latest
