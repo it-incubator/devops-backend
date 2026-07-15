@@ -30,6 +30,7 @@ jobs:
           docker push $IMAGE_LATEST
           echo "image_sha=$IMAGE_SHA" >> $GITHUB_OUTPUT
 
+
   deploy:
     needs: [ build ]
     uses: ./.github/workflows/deploy-argocd.yml
