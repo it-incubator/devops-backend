@@ -8,6 +8,7 @@ RUN npm run build
 
 # Stage 2: запуск с production-зависимостями
 FROM node:24-alpine
+USER node
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
