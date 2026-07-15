@@ -26,3 +26,29 @@ jobs:
             --verbose \
             --redact \
             --exit-code 1
+
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show files
+        run: ls -la
+
+      - name: Run Semgrep scan
+        run: |
+          semgrep scan \
+            --config=p/typescript \
+            --config=p/nodejs \
+            --config=p/owasp-top-ten \
+            --config=p/jwt \
+            --error \
+            --exclude=node_modules \
+            --exclude=dist \
+            --exclude=build \
+            --exclude=kubernetes \
+            .
