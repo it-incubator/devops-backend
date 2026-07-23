@@ -47,3 +47,6 @@ jobs:
             cd dev-less
             docker compose pull backend
             docker compose up -d backend
+
+
+            
