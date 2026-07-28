@@ -25,3 +25,4 @@ jobs:
 
       - name: Запуск тестов
         run: npm run test
+
