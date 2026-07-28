@@ -17,8 +17,8 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Hello DevOps v2.0"', () => {
-      if (process.version.startsWith('v20')) {
-        throw new Error('Node < 20!!');
+      if (process.version.startsWith('v24')) {
+        throw new Error('Node < 24!!');
       }
       expect(appController.getHello()).toBe('Hello DevOps v2.0');
     });
