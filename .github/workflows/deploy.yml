@@ -47,9 +47,12 @@ jobs:
             cd dev-less
             docker compose pull backend
             docker compose up -d backend
-            
+  notify:
+    needs: [checks, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
       - name: Notify Telegram
-        if: always()
         run: |
           STATUS="${{ job.status }}"
           if [ "$STATUS" = "success" ]; then
