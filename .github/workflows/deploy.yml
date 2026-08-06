@@ -36,30 +36,30 @@ jobs:
 
 
 
-  deploy:
-    needs: checks
-    runs-on: ubuntu-latest
+  # deploy:
+  #   needs: checks
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-     
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
      
 
-      # 4. Обновление на вашем VPS по SSH
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd dev-less
-            docker compose pull backend
-            docker compose up -d backend
+     
 
-  notify:
-    needs: [checks, deploy]
-    uses: ./.github/workflows/notify.yml
+  #     # 4. Обновление на вашем VPS по SSH
+  #     - name: Deploy via SSH
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.SSH_HOST }}
+  #         username: ${{ secrets.SSH_USER }}
+  #         key: ${{ secrets.SSH_PRIVATE_KEY }}
+  #         script: |
+  #           cd dev-less
+  #           docker compose pull backend
+  #           docker compose up -d backend
+
+  # notify:
+  #   needs: [checks, deploy]
+  #   uses: ./.github/workflows/notify.yml
