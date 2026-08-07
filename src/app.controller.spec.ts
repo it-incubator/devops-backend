@@ -16,11 +16,11 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello DevOps v2.0"', () => {
+    it('should return "Hello DevOps v3.0"', () => {
       if (process.version.startsWith('v25')) {
         throw new Error('Node < 25!!');
       }
-      expect(appController.getHello()).toBe('Hello DevOps v2.0');
+      expect(appController.getHello()).toBe('Hello DevOps v3.0');
     });
   });
 });
