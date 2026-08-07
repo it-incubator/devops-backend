@@ -6,7 +6,6 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Notify Telegram
         run: |

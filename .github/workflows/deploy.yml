@@ -5,12 +5,14 @@ on:
     branches: [main]
 
 jobs:
-  # checks:
-  #   uses: ./.github/workflows/pr-check.yml
+  checks:
+    uses: ./.github/workflows/pr-check.yml
 
   build:
-    # needs: [checks]
+    needs: [checks]
     runs-on: ubuntu-latest
+    outputs:
+      image_sha: ${{ steps.build-push.outputs.image_sha }}
     steps:
       - uses: actions/checkout@v4
 
@@ -24,38 +26,37 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push Backend image
+        id: build-push
         env: 
           IMAGE_SHA: ${{ secrets.DOCKERHUB_USER }}/backend:sha-${{ github.sha }}
           IMAGE_LATEST: ${{ secrets.DOCKERHUB_USER }}/backend:latest
         run: |
           docker buildx build --platform linux/amd64 -t $IMAGE_SHA -t $IMAGE_LATEST --push .
+          echo "image_sha=$IMAGE_SHA" >> $GITHUB_OUTPUT
 
 
 
-  # deploy:
-  #   needs: checks
-  #   runs-on: ubuntu-latest
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd dev-less
 
-     
+            # Берём имя образа из output предыдущего job'а — не дублируем
+            sed -i "s|DOCKER_IMAGE=.*|DOCKER_IMAGE=${{ needs.build.outputs.image_sha }}|" .env
+            docker compose pull backend
+            # Перезапускаем только backend, не трогая frontend и db
+            docker compose up -d --no-deps backend
 
-     
-
-  #     # 4. Обновление на вашем VPS по SSH
-  #     - name: Deploy via SSH
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         host: ${{ secrets.SSH_HOST }}
-  #         username: ${{ secrets.SSH_USER }}
-  #         key: ${{ secrets.SSH_PRIVATE_KEY }}
-  #         script: |
-  #           cd dev-less
-  #           docker compose pull backend
-  #           docker compose up -d backend
-
-  # notify:
-  #   needs: [checks, deploy]
-  #   uses: ./.github/workflows/notify.yml
+  notify:
+    needs: [checks, deploy, build]
+    if: always()
+    uses: ./.github/workflows/notify.yml
